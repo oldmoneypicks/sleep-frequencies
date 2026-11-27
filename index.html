@@ -142,8 +142,8 @@ footer a{color:var(--lav)}
 <script>
 {
 const AUDIO='https://github.com/oldmoneypicks/sleep-frequencies/releases/download/audio-v1/';
-const BUY='';              // Gumroad product link (fill in after the store is set up)
-const PRODUCT_ID='';       // Gumroad product_id for license checks
+const BUY='https://moneypicks.gumroad.com/l/sleep';              // Gumroad product link (fill in after the store is set up)
+const PRODUCT_ID='y8wsY3D-bkVmsaIv7M1bXQ==';       // Gumroad product_id for license checks
 const $=id=>document.getElementById(id),au=$('au');
 const store={get(k,d){try{const v=localStorage.getItem('sf_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('sf_'+k,JSON.stringify(v))}catch(e){}}};
 const fmt=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x};
