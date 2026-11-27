@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Sleep Frequencies</title>
+<meta name="description" content="Gentle sleep music: much-loved melodies on vibraphone, harp and piano, tuned to 432, 528 and 639 Hz.">
+<meta name="theme-color" content="#150f1e">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-180.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Sleep">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600&family=Nunito+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+/* VOICE: tender, quiet, bedtime — few words, lots of night air
+   IDEA: a bedside music box that glows softly in a dark room
+   PICTURE: the painting of the chosen song inside a slowly breathing ring of light
+   COLOUR and TYPE: plum night #150f1e, lavender #bfaee8, peach glow #ffc9a3; Fraunces + Nunito Sans
+   LAYOUT: player on top (picture, title, controls, timer), song list below, locked library last */
+:root{color-scheme:dark;--bg:#150f1e;--bg2:#1f1730;--card:#251c38;--ink:#f3eefb;--mute:#b3a8c9;--lav:#bfaee8;--glow:#ffc9a3;--line:#3a2f52}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:radial-gradient(120% 70% at 50% 0%,#2a1d44 0%,var(--bg) 60%) fixed,var(--bg);color:var(--ink);font:16px/1.55 "Nunito Sans",system-ui,sans-serif;overflow-x:clip;min-height:100vh}
+main{max-width:560px;margin:0 auto;padding:22px 18px 60px}
+h1{font:600 30px/1.05 Fraunces,Georgia,serif;margin:0;text-wrap:balance}
+h2{font:600 22px/1.1 Fraunces,Georgia,serif;margin:34px 0 12px}
+.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+.top small{color:var(--mute);font-size:14px}
+.stage{position:relative;margin:22px auto 8px;width:min(78vw,320px);aspect-ratio:1}
+.ring{position:absolute;inset:-14px;border-radius:50%;background:radial-gradient(circle,rgba(255,201,163,.55) 0%,rgba(191,174,232,.25) 45%,transparent 70%);filter:blur(6px);opacity:.55;transition:opacity 1s}
+.playing .ring{animation:breathe 10s ease-in-out infinite}
+@keyframes breathe{0%,100%{transform:scale(.94);opacity:.45}50%{transform:scale(1.06);opacity:.95}}
+.art{position:absolute;inset:0;border-radius:50%;overflow:hidden;border:2px solid rgba(255,201,163,.35);box-shadow:0 20px 60px rgba(0,0,0,.55)}
+.art img{width:100%;height:100%;object-fit:cover}
+.now{text-align:center;margin-top:18px}
+.now .hz{display:inline-block;color:var(--bg);background:var(--glow);font-weight:700;font-size:14px;border-radius:99px;padding:3px 12px}
+.now h3{font:600 26px/1.1 Fraunces,Georgia,serif;margin:10px 0 2px}
+.now p{margin:0;color:var(--mute);font-size:15px}
+.ctrl{display:flex;justify-content:center;align-items:center;gap:22px;margin:20px 0 6px}
+button{font:inherit;color:inherit;cursor:pointer;border:0;background:none;-webkit-tap-highlight-color:transparent}
+button:focus-visible{outline:2px solid var(--glow);outline-offset:3px}
+.ic{width:48px;height:48px;border-radius:50%;display:grid;place-items:center;color:var(--lav)}
+.ic svg{width:26px;height:26px;fill:currentColor}
+.play{width:76px;height:76px;border-radius:50%;background:var(--glow);color:var(--bg);display:grid;place-items:center;box-shadow:0 8px 30px rgba(255,201,163,.35)}
+.play svg{width:34px;height:34px;fill:currentColor}
+.bar{display:flex;align-items:center;gap:10px;color:var(--mute);font-size:13px;font-variant-numeric:tabular-nums}
+.bar input{flex:1}
+input[type=range]{accent-color:var(--glow);height:44px}
+.timer{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px}
+.chip{min-height:44px;padding:0 16px;border-radius:99px;border:1px solid var(--line);background:var(--bg2);color:var(--ink);font-size:15px;white-space:nowrap}
+.chip[aria-pressed=true]{background:var(--lav);color:var(--bg);border-color:var(--lav);font-weight:700}
+.left{text-align:center;color:var(--glow);font-size:14px;min-height:22px;margin-top:8px;font-variant-numeric:tabular-nums}
+.vol{display:flex;align-items:center;gap:10px;margin-top:6px;color:var(--mute)}
+.vol svg{width:20px;height:20px;fill:currentColor;flex:none}.vol input{flex:1}
+.list{display:grid;gap:10px}
+.song{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:14px;padding:10px;border-radius:16px;background:var(--card);border:1px solid transparent;text-align:left;width:100%;min-height:76px}
+.song[aria-current=true]{border-color:var(--glow)}
+.song img{width:56px;height:56px;border-radius:12px;object-fit:cover}
+.song b{display:block;font-size:16px}.song span{color:var(--mute);font-size:14px}
+.song .tag{font-size:13px;font-weight:700;color:var(--glow);white-space:nowrap}
+.locked{display:grid;gap:8px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.locked div{padding:12px;border-radius:12px;background:var(--bg2);color:var(--mute);font-size:14px;display:flex;justify-content:space-between;gap:8px}
+.locked i{font-style:normal;color:var(--lav);font-size:13px;white-space:nowrap}
+.cta{margin-top:16px;width:100%;min-height:56px;border-radius:16px;background:linear-gradient(90deg,var(--glow),#f3b0c6);color:var(--bg);font-weight:700;font-size:17px}
+.note{color:var(--mute);font-size:13px;text-align:center;margin-top:10px}
+.dim{position:fixed;inset:0;background:#000;opacity:0;pointer-events:none;transition:opacity 2s;z-index:9;display:grid;place-items:center;color:#4a3d63;font-size:14px}
+.dim.on{opacity:.96;pointer-events:auto}
+.sheet{position:fixed;inset:auto 0 0 0;background:var(--bg2);border-radius:22px 22px 0 0;padding:24px 20px 34px;transform:translateY(110%);transition:transform .35s;z-index:10;max-width:560px;margin:0 auto;box-shadow:0 -20px 60px rgba(0,0,0,.5)}
+.sheet.on{transform:none}
+.sheet h3{font:600 22px/1.15 Fraunces,Georgia,serif;margin:0 0 8px}
+.sheet ul{padding-left:20px;margin:8px 0 14px;color:var(--mute)}
+@media(prefers-reduced-motion:reduce){.playing .ring{animation:none;opacity:.8}.sheet,.dim{transition:none}}
+@media(max-width:360px){h1{font-size:26px}.locked{grid-template-columns:1fr}}
+/* full app additions */
+.tools{display:grid;gap:10px;margin-bottom:12px}
+.search{width:100%;min-height:46px;border-radius:14px;border:1px solid var(--line);background:var(--bg2);color:var(--ink);padding:0 14px;font:inherit}
+.search::placeholder{color:var(--mute)}
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cats .chip{flex:none}
+.song .lock{font-size:13px;color:var(--lav);white-space:nowrap}
+.song.isLocked b{color:var(--mute)}
+.song.isLocked img{filter:saturate(.5) brightness(.75)}
+.mode{display:flex;justify-content:center;gap:8px;margin-top:10px}
+.count{color:var(--mute);font-size:14px;margin:-4px 0 12px}
+.key{display:flex;gap:8px;margin-top:12px}
+.key input{flex:1;min-height:48px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:0 12px;font:inherit}
+.key button{min-height:48px;padding:0 16px;border-radius:12px;background:var(--lav);color:var(--bg);font-weight:700}
+.msg{min-height:20px;font-size:14px;color:var(--glow);margin-top:8px}
+.ghost{margin-top:10px;width:100%;min-height:48px;border-radius:14px;border:1px solid var(--line);color:var(--mute)}
+.premium{color:var(--glow);font-size:14px;font-weight:700}
+.install{display:none;margin-top:14px}
+.install.on{display:block}
+footer{margin-top:40px;color:var(--mute);font-size:13px;text-align:center;line-height:1.6}
+footer a{color:var(--lav)}
+</style>
+</head>
+<body>
+<main id="app">
+  <div class="top"><h1>Sleep Frequencies</h1><button class="chip" id="dimBtn" aria-label="Dim the screen">Dim</button></div>
+  <div class="stage"><div class="ring"></div><div class="art"><img id="art" alt=""></div></div>
+  <div class="now"><span class="hz" id="hz"></span><h3 id="title"></h3><p id="sub"></p></div>
+  <div class="ctrl">
+    <button class="ic" id="prev" aria-label="Previous song"><svg viewBox="0 0 24 24"><path d="M6 6h2v12H6zM9.5 12 18 6v12z"/></svg></button>
+    <button class="play" id="play" aria-label="Play"><svg viewBox="0 0 24 24" id="playIc"><path d="M8 5v14l11-7z"/></svg></button>
+    <button class="ic" id="next" aria-label="Next song"><svg viewBox="0 0 24 24"><path d="M16 6h2v12h-2zM6 18l8.5-6L6 6z"/></svg></button>
+  </div>
+  <div class="bar"><span id="cur">0:00</span><input type="range" id="seek" min="0" max="1800" value="0" aria-label="Position"><span id="dur">30:00</span></div>
+  <div class="mode" role="group" aria-label="When the song ends">
+    <button class="chip" data-r="one">Repeat this song</button><button class="chip" data-r="all">Play the next song</button>
+  </div>
+  <div class="timer" role="group" aria-label="Sleep timer">
+    <button class="chip" data-m="0">No timer</button><button class="chip" data-m="30">30 min</button><button class="chip" data-m="60">1 hour</button><button class="chip" data-m="120">2 hours</button><button class="chip" data-m="480">All night</button>
+  </div>
+  <div class="left" id="left"></div>
+  <label class="vol"><svg viewBox="0 0 24 24"><path d="M4 9v6h4l5 5V4L8 9z"/></svg><input type="range" id="vol" min="0" max="1" step="0.01" value="0.8" aria-label="Volume"></label>
+
+  <h2>Library</h2>
+  <p class="count" id="count"></p>
+  <div class="tools">
+    <input class="search" id="q" type="search" placeholder="Find a song" aria-label="Find a song">
+    <div class="cats" id="cats" role="group" aria-label="Song type"></div>
+  </div>
+  <div class="list" id="list"></div>
+  <button class="cta" id="unlock">Unlock every song · $4.99</button>
+  <p class="premium" id="isPrem" hidden>Premium is on. Thank you. Sleep well.</p>
+  <button class="ghost install" id="install">Add to home screen</button>
+  <footer>Melodies in the public domain, newly arranged by us on real vibraphone, harp and piano, each tuned so the home note sits on its frequency.<br>Music for rest and relaxation only, not medical treatment.</footer>
+</main>
+<div class="dim" id="dim">Tap to wake</div>
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="shT">
+  <h3 id="shT">Sleep Frequencies Premium</h3>
+  <ul><li id="shN">Every song, from hymns to lullabies</li><li>New songs added over time</li><li>Pay once, keep forever, no subscription</li></ul>
+  <a class="cta" id="buy" href="#" target="_blank" rel="noopener" style="display:grid;place-items:center;text-decoration:none">Buy Premium · $4.99</a>
+  <div class="key"><input id="lic" placeholder="Paste your license key" aria-label="License key" autocomplete="off"><button id="licGo">Unlock</button></div>
+  <div class="msg" id="msg" role="status"></div>
+  <button class="ghost" id="shClose">Close</button>
+</div>
+<audio id="au" preload="metadata"></audio>
+<script>
+{
+const AUDIO='https://github.com/oldmoneypicks/sleep-frequencies/releases/download/audio-v1/';
+const BUY='';              // Gumroad product link (fill in after the store is set up)
+const PRODUCT_ID='';       // Gumroad product_id for license checks
+const $=id=>document.getElementById(id),au=$('au');
+const store={get(k,d){try{const v=localStorage.getItem('sf_'+k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem('sf_'+k,JSON.stringify(v))}catch(e){}}};
+const fmt=s=>{s=Math.max(0,Math.floor(s));const h=Math.floor(s/3600),m=Math.floor(s%3600/60),x=String(s%60).padStart(2,'0');return h?h+':'+String(m).padStart(2,'0')+':'+x:m+':'+x};
+const esc=t=>t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+let S=[],i=0,end=0,fade=null,cat='All',prem=store.get('prem',false),rep=store.get('rep','one');
+const ok=s=>prem||s.free;
+function draw(){
+ const q=$('q').value.trim().toLowerCase();
+ const v=S.map((s,k)=>[s,k]).filter(([s])=>(cat==='All'||(cat==='Free'?s.free:s.cat===cat))&&(!q||s.t.toLowerCase().includes(q)||String(s.hz).includes(q)));
+ $('list').innerHTML=v.map(([s,k])=>`<button class="song${ok(s)?'':' isLocked'}" data-k="${k}" aria-current="${k===i}"><img src="art/${s.id}.jpg" alt="" loading="lazy" width="56" height="56"><div><b>${esc(s.t)}</b><span>${esc(s.mood)}</span></div>${ok(s)?`<span class="tag">${s.hz} Hz</span>`:'<span class="lock">Premium</span>'}</button>`).join('')||'<p class="note">No song found.</p>';
+ $('count').textContent=prem?S.length+' songs, all unlocked':S.filter(s=>s.free).length+' free songs · '+S.length+' songs in Premium';
+ $('unlock').hidden=prem;$('isPrem').hidden=!prem;$('shN').textContent='All '+S.length+' songs, from hymns to lullabies';
+}
+function cats(){
+ const c=['All','Free',...['Christmas','Hymns','Lullabies','Classical','Folk','Golden Oldies'].filter(x=>S.some(s=>s.cat===x))];
+ $('cats').innerHTML=c.map(x=>`<button class="chip" data-c="${x}" aria-pressed="${x===cat}">${x}</button>`).join('');
+}
+function load(k,auto){
+ i=(k+S.length)%S.length;const s=S[i];
+ if(!ok(s)){$('sheet').classList.add('on');return}
+ au.src=AUDIO+s.f;$('art').src='art/'+s.id+'.jpg';
+ $('hz').textContent=s.hz+' Hz';$('title').textContent=s.t;$('sub').textContent=s.mood;
+ document.querySelectorAll('.song').forEach(b=>b.setAttribute('aria-current',+b.dataset.k===i));
+ store.set('song',s.id);
+ if('mediaSession' in navigator){navigator.mediaSession.metadata=new MediaMetadata({title:s.t,artist:s.hz+' Hz · Sleep Frequencies',artwork:[{src:new URL('art/'+s.id+'.jpg',location.href).href,sizes:'400x400',type:'image/jpeg'}]})}
+ if(auto)play();
+}
+function step(d){let k=i;for(let n=0;n<S.length;n++){k=(k+d+S.length)%S.length;if(ok(S[k]))return k}return i}
+function play(){au.volume=+$('vol').value;au.play().catch(()=>{$('left').textContent='Tap play to start the music'})}
+function ui(){const p=!au.paused;$('app').classList.toggle('playing',p);$('play').setAttribute('aria-label',p?'Pause':'Play');$('playIc').innerHTML=p?'<path d="M7 5h4v14H7zm6 0h4v14h-4z"/>':'<path d="M8 5v14l11-7z"/>'}
+au.addEventListener('play',ui);au.addEventListener('pause',ui);
+au.addEventListener('ended',()=>{if(rep==='one'){au.currentTime=0;play()}else load(step(1),true)});
+au.addEventListener('error',()=>{if(au.src)$('left').textContent='This song could not load. Check the internet connection.'});
+au.addEventListener('timeupdate',()=>{$('seek').value=au.currentTime;$('cur').textContent=fmt(au.currentTime)});
+au.addEventListener('loadedmetadata',()=>{$('seek').max=au.duration;$('dur').textContent=fmt(au.duration)});
+$('seek').addEventListener('input',e=>{au.currentTime=+e.target.value});
+$('play').addEventListener('click',()=>au.paused?(au.src?play():load(i,true)):au.pause());
+$('prev').addEventListener('click',()=>load(step(-1),!au.paused));
+$('next').addEventListener('click',()=>load(step(1),!au.paused));
+$('list').addEventListener('click',e=>{const b=e.target.closest('.song');if(b)load(+b.dataset.k,true)});
+$('cats').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;cat=b.dataset.c;cats();draw()});
+$('q').addEventListener('input',draw);
+$('vol').addEventListener('input',e=>{au.volume=+e.target.value;store.set('vol',+e.target.value)});
+function setRep(r){rep=r;store.set('rep',r);document.querySelectorAll('.mode .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.r===r))}
+document.querySelector('.mode').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)setRep(b.dataset.r)});
+function setTimer(m){
+ store.set('timer',m);clearInterval(fade);fade=null;
+ document.querySelectorAll('.timer .chip').forEach(b=>b.setAttribute('aria-pressed',+b.dataset.m===m));
+ end=m?Date.now()+m*60000:0;show();
+}
+function show(){
+ if(!end){if(!/could not|Good night|Tap play/.test($('left').textContent))$('left').textContent='';return}
+ const r=(end-Date.now())/1000;
+ if(r<=60&&!au.paused&&!fade){const v0=au.volume;fade=setInterval(()=>{const q=(end-Date.now())/60000;au.volume=Math.max(0,v0*q);if(q<=0){clearInterval(fade);fade=null;au.pause();au.volume=+$('vol').value;end=0;document.querySelectorAll('.timer .chip').forEach(b=>b.setAttribute('aria-pressed',b.dataset.m==='0'));$('left').textContent='Good night. Music stopped softly.'}},500)}
+ if(end)$('left').textContent='Music fades out in '+fmt(r);
+}
+setInterval(show,1000);
+document.querySelector('.timer').addEventListener('click',e=>{const b=e.target.closest('.chip');if(b)setTimer(+b.dataset.m)});
+$('dimBtn').addEventListener('click',()=>$('dim').classList.add('on'));
+$('dim').addEventListener('click',()=>$('dim').classList.remove('on'));
+$('unlock').addEventListener('click',()=>$('sheet').classList.add('on'));
+$('shClose').addEventListener('click',()=>$('sheet').classList.remove('on'));
+if(BUY)$('buy').href=BUY;else{$('buy').removeAttribute('href');$('buy').textContent='Premium opens soon';$('buy').style.opacity=.6}
+async function unlock(){
+ const k=$('lic').value.trim();if(!k){$('msg').textContent='Paste the license key from your receipt email.';return}
+ if(!PRODUCT_ID){$('msg').textContent='Premium is not open yet. Please check back soon.';return}
+ $('msg').textContent='Checking…';
+ try{const r=await fetch('https://api.gumroad.com/v2/licenses/verify',{method:'POST',body:new URLSearchParams({product_id:PRODUCT_ID,license_key:k,increment_uses_count:'false'})});const j=await r.json();
+  if(j.success&&!j.purchase.refunded&&!j.purchase.chargebacked){prem=true;store.set('prem',true);$('msg').textContent='Unlocked. Enjoy every song.';cats();draw();setTimeout(()=>$('sheet').classList.remove('on'),1200)}
+  else $('msg').textContent='That key did not work. Check it and try again.'}
+ catch(e){$('msg').textContent='Could not check the key. Check the internet connection and try again.'}
+}
+$('licGo').addEventListener('click',unlock);
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){$('sheet').classList.remove('on');$('dim').classList.remove('on')}});
+if('mediaSession' in navigator){navigator.mediaSession.setActionHandler('play',play);navigator.mediaSession.setActionHandler('pause',()=>au.pause());navigator.mediaSession.setActionHandler('nexttrack',()=>load(step(1),true));navigator.mediaSession.setActionHandler('previoustrack',()=>load(step(-1),true))}
+let ask=null;addEventListener('beforeinstallprompt',e=>{e.preventDefault();ask=e;$('install').classList.add('on')});
+$('install').addEventListener('click',()=>{if(ask){ask.prompt();ask=null;$('install').classList.remove('on')}});
+if('serviceWorker' in navigator)addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+$('vol').value=store.get('vol',0.8);setRep(rep);setTimer(store.get('timer',60));ui();
+fetch('songs.json').then(r=>r.json()).then(d=>{S=d;const id=store.get('song','');let k=S.findIndex(s=>s.id===id&&ok(s));if(k<0)k=S.findIndex(ok);cats();draw();load(Math.max(0,k),false)});
+}
+</script>
+</body>
+</html>
